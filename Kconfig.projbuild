@@ -1,0 +1,11 @@
+menu "I2C Config" 
+    config SDA_PIN
+    int "SDA PIN"
+    default 39
+config SCL_PIN
+    int "SCL PIN"
+    default 40
+config I2C_FREQUENCY
+    int "I2C FREQUENCY (KHz)"
+    default 400
+endmenu
