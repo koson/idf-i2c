@@ -1,11 +1,17 @@
 menu "I2C Config" 
-    config SDA_PIN
+config IXC_BUS
+    bool "IxC Active"
+    default y 
+config SDA_PIN
     int "SDA PIN"
     default 39
+    depends on IXC_BUS
 config SCL_PIN
     int "SCL PIN"
     default 40
+    depends on IXC_BUS
 config I2C_FREQUENCY
     int "I2C FREQUENCY (KHz)"
     default 400
+    depends on IXC_BUS
 endmenu
