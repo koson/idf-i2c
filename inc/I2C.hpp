@@ -8,9 +8,12 @@
 #include <vector>
 #include <list>
 #include <future>
-
+#include "esp_timer.h"
 #include "Exceptions.hpp"
 #include "Gpio.hpp"
+#ifndef millis
+#define millis() (esp_timer_get_time() / 1000UL)
+#endif
 using namespace System;
 namespace Components
 {
@@ -59,7 +62,6 @@ namespace Components
     class I2CCommandLink
     {
     public:
-    
         I2CCommandLink();
         ~I2CCommandLink();
 
@@ -88,17 +90,14 @@ namespace Components
         TReturn doTransfer(I2CNumber i2c_num, I2CAddress i2c_addr);
 
     protected:
-
         virtual void queueCmd(I2CCommandLink &handle, I2CAddress i2c_addr) = 0;
         virtual TReturn processResult() = 0;
         std::chrono::milliseconds driver_timeout;
     };
 
- 
     class I2CBus
     {
     public:
-
         explicit I2CBus(I2CNumber i2c_number);
         virtual ~I2CBus();
         const I2CNumber i2c_num;
@@ -107,14 +106,12 @@ namespace Components
     class I2CMaster : public I2CBus
     {
     public:
-    
-      explicit I2CMaster(I2CNumber i2c_number,
-              SCL_GPIO scl_gpio,
-              SDA_GPIO sda_gpio,
-              Frequency clock_speed,
-              bool scl_pullup = true,
-              bool sda_pullup = true);
-
+        explicit I2CMaster(I2CNumber i2c_number,
+                           SCL_GPIO scl_gpio,
+                           SDA_GPIO sda_gpio,
+                           Frequency clock_speed,
+                           bool scl_pullup = true,
+                           bool sda_pullup = true);
 
         virtual ~I2CMaster();
 
@@ -124,15 +121,14 @@ namespace Components
         std::vector<uint8_t> syncRead(I2CAddress i2c_addr, size_t n_bytes);
         std::vector<uint8_t> scan();
         std::vector<uint8_t> syncTransfer(I2CAddress i2c_addr,
-                                           const std::vector<uint8_t> &write_data,
-                                           size_t read_n_bytes);
+                                          const std::vector<uint8_t> &write_data,
+                                          size_t read_n_bytes);
     };
 
 #if CONFIG_SOC_I2C_SUPPORT_SLAVE
     class I2CSlave : public I2CBus
     {
     public:
-       
         I2CSlave(I2CNumber i2c_number,
                  SCL_GPIO scl_gpio,
                  SDA_GPIO sda_gpio,
@@ -173,7 +169,6 @@ namespace Components
         std::vector<uint8_t> bytes;
     };
 
-
     class I2CComposed : public I2CTransfer<std::vector<std::vector<uint8_t>>>
     {
     public:
@@ -182,7 +177,6 @@ namespace Components
         void addWrite(std::vector<uint8_t> bytes);
 
     protected:
-   
         void queueCmd(I2CCommandLink &handle, I2CAddress i2c_addr) override;
         std::vector<std::vector<uint8_t>> processResult() override;
 
@@ -249,4 +243,4 @@ namespace Components
             xfer, i2c_addr);
     }
 
-} 
+}
